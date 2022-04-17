@@ -1,0 +1,14 @@
+.vscode/
+.idea/
+__pycache__/
+
+.downloads/
+localtest/
+data/
+log/
+tmp/
+deploy/
+
+*.db
+*.sqlite
+*.sqlite3
