@@ -35,6 +35,6 @@ class Task(models.Model):
     source = models.TextField(default='')
     message = models.TextField(default='')
     target_name = models.CharField(max_length=64)
-    creation_time = models.DateTimeField(auto_now_add=True, blank=True)
-    finish_time = models.DateTimeField()
+    creation_time = models.DateTimeField(auto_now_add=True)
+    finish_time = models.DateTimeField(blank=True, null=True)
     creator_ip = models.CharField(max_length=64, default='')

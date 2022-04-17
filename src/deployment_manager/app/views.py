@@ -57,7 +57,7 @@ def webhook(request: WSGIRequest):
 
     try:
         target = Target.objects.get(name=target_name)
-    except Identity.DoesNotExist as e:
+    except Target.DoesNotExist as e:
         return HttpResponseBadRequest('Error: target is not valid.')
     if not target.valid:
         return HttpResponseBadRequest('Error: target is not valid.')

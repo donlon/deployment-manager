@@ -32,7 +32,7 @@ GITHUB_TOKEN = os.getenv('APP_GITHUB_TOKEN', '')
 SECRET_KEY = os.getenv('APP_SECRET_KEY', 'django-insecure-cfz$bret&(^n=mf)k8vj)b7a+wy-0uiqd!trk8k7%-f+)f-60z')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.getenv('APP_PRODUCTION', 'False').lower() == 'true'
+DEBUG = os.getenv('APP_PRODUCTION', 'False').lower() == 'false'
 
 ALLOWED_HOSTS = [host for host in os.getenv('APP_ALLOWED_HOSTS', '').split(',') if host]
 

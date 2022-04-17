@@ -4,7 +4,7 @@ export APP_STATIC_FILE_PATH="${APP_STATIC_FILE_PATH:-/tmp/deployment-manager}"
 
 mkdir -p "$APP_STATIC_FILE_PATH"
 
-python manage.py migrate --no-input
+python manage.py migrate --run-syncdb --no-input
 
 python manage.py collectstatic --no-input
 
