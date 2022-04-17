@@ -5,6 +5,8 @@ import os
 import queue
 import shutil
 import threading
+import traceback
+import time
 import zipfile
 
 import requests
@@ -24,17 +26,31 @@ def enqueue_task(task: Task):
 
 
 def _get_artifacts_url(repo, token, run_id, artifact_name):
-    r = requests.get(f'https://api.github.com/repos/{repo}/actions/runs/{run_id}/artifacts', headers={
-        'Authorization': f'token {token}'
-    })
+    sleep_time = 2
+    for _ in range(5):
+        r = requests.get(f'https://api.github.com/repos/{repo}/actions/runs/{run_id}/artifacts', headers={
+            'Authorization': f'token {token}'
+        })
 
-    data = r.json()
-    if not 'artifacts' in data:
-        return
+        data = r.json()
+        if 'artifacts' not in data:
+            if settings.DEBUG:
+                print('Artifact is not found.')
+                print(data)
+            return
 
-    for artifact in data['artifacts']:
-        if artifact['name'] == artifact_name:
-            return artifact['archive_download_url']
+        for artifact in data['artifacts']:
+            if artifact['name'] == artifact_name:
+                return artifact['archive_download_url']
+
+        if settings.DEBUG:
+            print('Sleep %d secs to wait artifact.' % int(sleep_time))
+        time.sleep(sleep_time)
+        sleep_time *= 2
+
+    if settings.DEBUG:
+        print('Artifact is not found.')
+        print(data)
 
 
 def _download_file(url, token, local_path):
@@ -58,29 +74,31 @@ def _remove_dir_content(folder):
 
 def _process_task_gh(task: Task):
     task_data = json.loads(task.data)
-    target = Target.objects.get(name=task_data['target'])
+    target = Target.objects.get(name=task.target_name)
     deploy_path = os.path.join(settings.DEPLOY_ROOT, target.path)
 
     task.status = Task.Status.DOWNLOADING
+    task.message = 'Getting information of the run'
     task.save()
 
     url = _get_artifacts_url(task_data['repo'], settings.GITHUB_TOKEN, task_data['run_id'], task_data['artifact'])
-    task.source = url
-
-    download_folder = os.path.join(settings.BASE_DIR, '.downloads')
-    os.makedirs(download_folder, exist_ok=True)
-    download_path = os.path.join(download_folder, str(task_data['run_id']) + '.zip')
-    if not download_path:
+    if not url:
         task.status = Task.Status.FAILED
+        task.message = 'Can\'t find artifact'
         task.save()
         return
 
-    task.status = Task.Status.DOWNLOADING
+    task.source = url
+    task.message = 'Ready to download'
     task.save()
 
+    download_folder = os.path.join(settings.BASE_DIR, '.downloads')
+    download_path = os.path.join(download_folder, str(task_data['run_id']) + '.zip')
+    os.makedirs(download_folder, exist_ok=True)
     _download_file(url, settings.GITHUB_TOKEN, download_path)
 
     task.status = Task.Status.DEPLOYING
+    task.message = 'Deploying to %s' % deploy_path
     task.save()
 
     os.makedirs(deploy_path, exist_ok=True)
@@ -89,6 +107,7 @@ def _process_task_gh(task: Task):
         zip.extractall(deploy_path)
         
     task.status = Task.Status.FINISHED
+    task.message = 'Finished'
     task.finish_time = datetime.datetime.now()
     task.save()
 
@@ -101,11 +120,15 @@ def _worker_thread():
             if task.source_type == Task.SourceType.GITHUB_ACTIONS:
                 _process_task_gh(task)
         except Exception as e:
+            traceback.print_exc()
             task.status = Task.Status.FAILED
             task.finish_time = datetime.datetime.now()
             task.message = str(e)
-            task.save()
-
+            try:
+                task.save()
+            except Exception as e:
+                traceback.print_exc()
+    
 
 def check_background_worker():
     global _thread_created

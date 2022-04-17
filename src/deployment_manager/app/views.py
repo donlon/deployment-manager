@@ -36,10 +36,10 @@ def webhook(request: WSGIRequest):
         return HttpResponseForbidden('Error: token is not valid.')
 
     if 'type' not in request.GET:
-        return
+        return HttpResponseBadRequest('Error: webhook type is not found')
     webhook_type = request.GET['type']
     if webhook_type != 'github-actions':
-        return HttpResponseBadRequest('Error: get webhook type')        
+        return HttpResponseBadRequest('Error: webhook type is not valid')
 
     if 'repo' not in request.POST:
         return HttpResponseBadRequest('Error: repo is not found')
@@ -81,4 +81,4 @@ def webhook(request: WSGIRequest):
     worker.check_background_worker()
     worker.enqueue_task(task)
 
-    return HttpResponse()
+    return HttpResponse('Task queued')
