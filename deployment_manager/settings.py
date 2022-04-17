@@ -36,7 +36,7 @@ DEBUG = os.getenv('APP_PRODUCTION', 'False').lower() == 'false'
 
 ALLOWED_HOSTS = [host for host in os.getenv('APP_ALLOWED_HOSTS', '').split(',') if host]
 
-BEHIND_PROXY = os.getenv('APP_BEHIND_PROXY', 'False').lower() == 'false'
+BEHIND_PROXY = os.getenv('APP_BEHIND_PROXY', 'False').lower() == 'true'
 
 CSRF_TRUSTED_ORIGINS = [origin for origin in os.getenv('APP_CSRF_TRUSTED_ORIGINS', '').split(',') if origin]
 
