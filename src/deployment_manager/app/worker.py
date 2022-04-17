@@ -105,7 +105,9 @@ def _process_task_gh(task: Task):
     _remove_dir_content(deploy_path)
     with zipfile.ZipFile(download_path, 'r') as zip:
         zip.extractall(deploy_path)
-        
+
+    os.unlink(download_path)
+
     task.status = Task.Status.FINISHED
     task.message = 'Finished'
     task.finish_time = datetime.datetime.now()
@@ -120,6 +122,7 @@ def _worker_thread():
             if task.source_type == Task.SourceType.GITHUB_ACTIONS:
                 _process_task_gh(task)
         except Exception as e:
+            # TODO: os.unlink downloaded file
             traceback.print_exc()
             task.status = Task.Status.FAILED
             task.finish_time = datetime.datetime.now()
