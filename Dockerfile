@@ -11,7 +11,7 @@ COPY requirements.txt .
 
 RUN pip install --no-warn-script-location --no-cache-dir --user -r requirements.txt
 
-COPY ./manage.py ./deployment_manager/ ./
+COPY ./src .
 COPY ./docker/entrypoint.sh /usr/local/bin
 
 RUN mkdir -p ${APP_DB_PATH} && chmod +x /usr/local/bin/entrypoint.sh
