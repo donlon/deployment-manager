@@ -1,6 +1,6 @@
 #!/bin/sh
 
-export APP_STATIC_FILE_PATH=/tmp/deployment-manager
+export APP_STATIC_FILE_PATH="${APP_STATIC_FILE_PATH:-/tmp/deployment-manager}"
 
 mkdir -p "$APP_STATIC_FILE_PATH"
 

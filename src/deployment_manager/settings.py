@@ -32,7 +32,7 @@ GITHUB_TOKEN = os.getenv('APP_GITHUB_TOKEN', '')
 SECRET_KEY = os.getenv('APP_SECRET_KEY', 'django-insecure-cfz$bret&(^n=mf)k8vj)b7a+wy-0uiqd!trk8k7%-f+)f-60z')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.getenv('APP_PRODUCTION', 'False').lower() == 'false'
+DEBUG = os.getenv('APP_PRODUCTION', 'False').lower() == 'true'
 
 ALLOWED_HOSTS = [host for host in os.getenv('APP_ALLOWED_HOSTS', '').split(',') if host]
 
@@ -130,7 +130,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/4.0/howto/static-files/
 
 STATIC_URL = ROOT_URL + 'static/'
-STATIC_ROOT = os.path.join(os.getenv('APP_STATIC_FILE_PATH', BASE_DIR), 'tmp', 'staticfiles')
+STATIC_ROOT = os.getenv('APP_STATIC_FILE_PATH', None) or os.path.join(BASE_DIR, 'tmp', 'staticfiles')
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
