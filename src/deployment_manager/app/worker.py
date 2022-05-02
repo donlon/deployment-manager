@@ -5,8 +5,8 @@ import os
 import queue
 import shutil
 import threading
-import traceback
 import time
+import traceback
 import zipfile
 
 import requests

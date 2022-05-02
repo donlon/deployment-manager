@@ -54,6 +54,9 @@ def webhook(request: WSGIRequest):
     run_id = request.POST['run_id']
     artifact_name = request.POST['artifact_name']
     target_name = request.POST['target']
+    actor = request.POST['actor'] if 'actor' in request.POST else None
+    commit_sha = request.POST['commit_sha'] if 'commit_sha' in request.POST else None
+    commit_ref = request.POST['commit_ref'] if 'commit_ref' in request.POST else None
 
     try:
         target = Target.objects.get(name=target_name)
@@ -69,6 +72,9 @@ def webhook(request: WSGIRequest):
         'run_id': run_id,
         'artifact': artifact_name,
         'target': target_name,
+        'actor': actor,
+        'commit_sha': commit_sha,
+        'commit_ref': commit_ref,
     }
 
     task = Task()
